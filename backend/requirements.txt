@@ -1,0 +1,11 @@
+# Backend Dependencies
+# Flask web framework for REST API
+flask==3.0.0
+flask-cors==4.0.0
+
+# Sentence embeddings for card similarity
+sentence-transformers==3.3.0
+
+# NumPy for vector math (cosine similarity)
+numpy==1.26.4
+    
