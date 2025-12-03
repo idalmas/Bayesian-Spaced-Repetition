@@ -137,6 +137,32 @@ def get_next_card():
     answer = all_cards[next_card_id]["answer"]
     return jsonify({"question": question, "answer": answer, "id": next_card_id})
 
+@app.route("/api/all_cards", methods=["GET"])
+def get_all_cards():
+    """
+    Get all cards with their mastery levels.
+    
+    Mastery is calculated as alpha / (alpha + beta), representing
+    the expected probability of getting the card correct.
+    
+    Returns:
+        JSON array of cards with id, question, and mastery (0-1)
+    
+    Example response:
+        [
+            {"id": 0, "question": "What is 2+2?", "mastery": 0.75},
+            {"id": 1, "question": "Capital of France?", "mastery": 0.5}
+        ]
+    """
+    cards_response = []
+    for card_id, card in all_cards.items():
+        cards_response.append({
+            "id": card_id,
+            "question": card["question"],
+            "mastery": card["alpha"] / (card["alpha"] + card["beta"])
+        })
+    return jsonify(cards_response)
+
 if __name__ == "__main__":
     # Run the development server
     # Debug mode enabled for auto-reload and detailed error messages

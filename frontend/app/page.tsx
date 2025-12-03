@@ -5,15 +5,17 @@
  * Displays:
  *   - AddCards: Component for creating new flashcards
  *   - ViewCard: Component for studying/reviewing cards
+ *   - MasteryGrid: Visual display of card mastery levels
  *
  * Parent: layout.tsx (root layout)
- * Children: AddCards, ViewCard
+ * Children: AddCards, ViewCard, MasteryGrid
  *
  * CSS: Flexbox centering with zinc background, vertical stack of components
  */
 
 import AddCards from "./components/AddCards";
 import ViewCard from "./components/ViewCard";
+import MasteryGrid from "./components/MasteryGrid";
 
 export default function Home() {
   return (
@@ -21,6 +23,7 @@ export default function Home() {
       <div className="flex flex-col gap-6 w-full max-w-lg">
         <AddCards />
         <ViewCard />
+        <MasteryGrid />
       </div>
     </div>
   );
