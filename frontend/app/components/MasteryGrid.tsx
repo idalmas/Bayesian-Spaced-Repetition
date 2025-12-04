@@ -9,10 +9,12 @@
  *   - 0.5 (yellow) → Medium mastery, uncertain
  *   - 1.0 (green)  → High mastery, likely to know
  *
- * Parent: page.tsx (or any page that needs mastery visualization)
+ * Parent: /progress/page.tsx
  * Children: None
  *
  * Props: None
+ *
+ * UI Components: Uses shadcn Button for refresh button
  *
  * API Endpoints Used:
  *   - GET /api/all_cards: Fetches all cards with their mastery values
@@ -25,6 +27,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { apiUrl } from "../lib/api";
+import { Button } from "@/components/ui/button";
 
 interface CardMastery {
   id: number;
@@ -114,13 +117,14 @@ export default function MasteryGrid() {
         <h1 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
           Mastery Grid
         </h1>
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={fetchCards}
           disabled={isLoading}
-          className="px-3 py-1.5 text-sm bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 disabled:opacity-50 text-zinc-700 dark:text-zinc-300 rounded-md transition-colors"
         >
           {isLoading ? "Loading..." : "Refresh"}
-        </button>
+        </Button>
       </div>
 
       {/* Color Legend */}
