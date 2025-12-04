@@ -8,14 +8,16 @@
  *
  * POSTs card data (front/back) to the backend /api/add_cards endpoint.
  *
- * Parent: page.tsx (or any page that needs card creation)
+ * Parent: /add/page.tsx (or any page that needs card creation)
  * Children: None
  *
  * Props: None
  *
+ * UI Components: Uses shadcn Button for all interactive buttons
+ *
  * CSS: Uses Tailwind utility classes. Container is a white card with shadow,
  *      max-width of lg (32rem), with padding and rounded corners.
- *      Tabs use border-bottom highlight for active state.
+ *      Tabs use ghost variant buttons with border-bottom for active state.
  */
 
 "use client";
@@ -225,28 +227,30 @@ export default function AddCards() {
 
       {/* Tab Navigation */}
       <div className="flex border-b border-zinc-200 dark:border-zinc-700 mb-6">
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => handleModeChange("single")}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-none ${
             mode === "single"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+              ? "text-primary border-b-2 border-primary"
+              : "text-muted-foreground"
           }`}
         >
           Single Card
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => handleModeChange("bulk")}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-none ${
             mode === "bulk"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+              ? "text-primary border-b-2 border-primary"
+              : "text-muted-foreground"
           }`}
         >
           Bulk Import
-        </button>
+        </Button>
       </div>
 
       {/* Single Card Form */}
@@ -286,13 +290,13 @@ export default function AddCards() {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={status.type === "loading"}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full"
           >
             {status.type === "loading" ? "Adding..." : "Add Card"}
-          </button>
+          </Button>
         </form>
       )}
 
@@ -348,22 +352,23 @@ export default function AddCards() {
               className="hidden"
               id="file-upload"
             />
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
-              className="px-3 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded-md text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
               Upload .json file
-            </button>
+            </Button>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={status.type === "loading"}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full"
           >
             {status.type === "loading" ? "Importing..." : "Import Cards"}
-          </button>
+          </Button>
         </form>
       )}
 

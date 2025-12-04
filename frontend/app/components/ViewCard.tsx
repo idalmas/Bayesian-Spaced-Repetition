@@ -12,10 +12,12 @@
  *   4. Click "Got it" (correct) or "Missed it" (incorrect)
  *   5. Automatically fetches next card
  *
- * Parent: page.tsx (or any page that needs card review)
+ * Parent: page.tsx (home page)
  * Children: None
  *
  * Props: None
+ *
+ * UI Components: Uses shadcn Button for all interactive buttons
  *
  * API Endpoints Used:
  *   - GET /api/next: Fetches the next card to review
@@ -150,12 +152,9 @@ export default function ViewCard() {
           <p className="text-zinc-600 dark:text-zinc-400 mb-4">
             Ready to review your flashcards?
           </p>
-          <button
-            onClick={fetchNextCard}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
+          <Button onClick={fetchNextCard} size="lg">
             Start Studying
-          </button>
+          </Button>
         </div>
       )}
 
@@ -181,12 +180,9 @@ export default function ViewCard() {
           <div className="p-4 bg-red-100 dark:bg-red-900/30 rounded-md mb-4">
             <p className="text-red-700 dark:text-red-400">{status.message}</p>
           </div>
-          <button
-            onClick={fetchNextCard}
-            className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 rounded-md transition-colors"
-          >
+          <Button variant="secondary" onClick={fetchNextCard}>
             Try Again
-          </button>
+          </Button>
         </div>
       )}
 
@@ -205,12 +201,9 @@ export default function ViewCard() {
 
           {/* Answer (hidden until revealed) */}
           {status.state === "studying" && (
-            <button
-              onClick={showAnswer}
-              className="w-full py-3 px-4 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2"
-            >
+            <Button variant="secondary" onClick={showAnswer} className="w-full" size="lg">
               Show Answer
-            </button>
+            </Button>
           )}
 
           {/* Answer revealed */}
@@ -227,20 +220,24 @@ export default function ViewCard() {
 
               {/* Response buttons */}
               <div className="flex gap-3">
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => submitAnswer(false)}
                   disabled={isSubmitting}
-                  className="flex-1 py-3 px-4 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 disabled:opacity-50 text-red-700 dark:text-red-400 font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="flex-1 border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+                  size="lg"
                 >
                   ✗ Missed it
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => submitAnswer(true)}
                   disabled={isSubmitting}
-                  className="flex-1 py-3 px-4 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 disabled:opacity-50 text-green-700 dark:text-green-400 font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="flex-1 border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
+                  size="lg"
                 >
                   ✓ Got it
-                </button>
+                </Button>
               </div>
             </>
           )}
