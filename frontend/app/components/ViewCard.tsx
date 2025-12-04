@@ -29,6 +29,7 @@
 
 import { useState } from "react";
 import { apiUrl } from "../lib/api";
+import { Button } from "@/components/ui/button";
 
 type StudyState = "idle" | "loading" | "studying" | "revealed" | "empty" | "error";
 
