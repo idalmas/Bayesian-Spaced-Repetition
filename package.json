@@ -1,0 +1,16 @@
+{
+  "name": "bayesian-spaced-repetition",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "cd frontend && npm run dev"
+  },
+  "dependencies": {
+    "next": "16.0.6"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
+
