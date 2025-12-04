@@ -1,11 +1,18 @@
 # Backend Dependencies
+# 
+# For local development with sentence-transformers (heavy but no API key needed):
+#   pip install -r requirements-local.txt
+#
+# For lightweight deployment with OpenAI embeddings (recommended):
+#   pip install -r requirements.txt
+#   export OPENAI_API_KEY=your-key
+
 # Flask web framework for REST API
 flask==3.0.0
 flask-cors==4.0.0
 
-# Sentence embeddings for card similarity
-sentence-transformers==3.3.0
+# HTTP client for OpenAI API calls
+requests>=2.28.0
 
 # NumPy for vector math (cosine similarity)
 numpy==1.26.4
-    

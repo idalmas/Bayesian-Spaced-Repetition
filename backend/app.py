@@ -7,14 +7,20 @@ Run this file directly to start the development server.
 Usage:
     python app.py
 
-The server will start at http://localhost:5000
+The server will start at http://localhost:5001
+
+Embedding Options:
+    - EMBEDDING_PROVIDER="openai" (default) - Uses OpenAI's text-embedding-3-small (~$0.02/1M tokens)
+    - EMBEDDING_PROVIDER="local" - Uses sentence-transformers (heavy, ~800MB+ dependencies)
+    
+Set OPENAI_API_KEY environment variable when using OpenAI embeddings.
 """
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from numpy import dot, linalg, ndarray
-from sentence_transformers import SentenceTransformer
 import math
+import os
 
 
 # Import hyperparameters (available for use in routes)
@@ -24,7 +30,55 @@ import config
 app = Flask(__name__)
 # Enable CORS for all routes - allows frontend (localhost:3000) to call backend (localhost:5001)
 CORS(app)
-model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# ============================================================================
+# EMBEDDING CONFIGURATION
+# Choose between OpenAI (lightweight, cheap) or local sentence-transformers (heavy)
+# ============================================================================
+EMBEDDING_PROVIDER = os.environ.get("EMBEDDING_PROVIDER", "openai")
+
+if EMBEDDING_PROVIDER == "local":
+    # Heavy option: sentence-transformers (~800MB+ dependencies)
+    # Only use this for local development if you don't have an OpenAI key
+    from sentence_transformers import SentenceTransformer
+    local_model = SentenceTransformer("all-MiniLM-L6-v2")
+    
+    def get_embedding(text):
+        """Get embedding using local sentence-transformers model."""
+        return local_model.encode(text)
+else:
+    # Lightweight option: OpenAI embeddings (recommended for Vercel)
+    # Cost: ~$0.02 per 1 million tokens (basically free for flashcards)
+    import requests
+    
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+    
+    def get_embedding(text):
+        """
+        Get embedding using OpenAI's text-embedding-3-small model.
+        
+        Input: text (str) - The text to embed
+        Output: list[float] - 1536-dimensional embedding vector
+        
+        Cost: ~$0.02 per 1 million tokens
+        """
+        if not OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY environment variable not set. "
+                           "Set it or use EMBEDDING_PROVIDER=local")
+        
+        response = requests.post(
+            "https://api.openai.com/v1/embeddings",
+            headers={
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "text-embedding-3-small",
+                "input": text
+            }
+        )
+        response.raise_for_status()
+        return response.json()["data"][0]["embedding"]
 
 # for now, these exist locally in a dict/arrays, but would be nice to be in a database
 # the schema of the all cards dict is: 
@@ -88,10 +142,6 @@ def add_cards():
     return jsonify({"status": "ok"})
 
 
-# returns the embedding of the text
-def get_embedding(text):
-    return model.encode(text)
-
 # compute the cosine similarity between two embeddings
 def compute_similarity(embedding1, embedding2):
     return dot(embedding1, embedding2) / (linalg.norm(embedding1) * linalg.norm(embedding2))
@@ -116,13 +166,36 @@ def answer():
 
     return jsonify({"status": "ok"})
 
-# get the card that we think are most likely to get wrong 
-# to do this, we use the pdf of the beta distribution for each card
-# this gets the card id of the card that we think are most likely to get wrong 
+
+# Selects the next card to review based on a weighted combination of:
+#   1. Expectation: alpha / (alpha + beta) - lower means more likely to get wrong
+#   2. Uncertainty: 1 / (alpha + beta) - higher means fewer observations/less confident
+# 
+# The weighting is controlled by config.UNCERTAINTY_FACTOR:
+#   - (1 - UNCERTAINTY_FACTOR) * expectation: prioritize cards likely to get wrong
+#   - UNCERTAINTY_FACTOR * uncertainty: prioritize cards we're uncertain about
+# 
+# Returns: card_id of the card with the lowest combined score (most needing review)
 def get_next_card_id():
-      return min(all_cards.keys(), key=lambda cid: all_cards[cid]["alpha"] / (all_cards[cid]["alpha"] + all_cards[cid]["beta"]))
+    def score(cid):
+        alpha = all_cards[cid]["alpha"]
+        beta = all_cards[cid]["beta"]
+        total = alpha + beta
+        
+        # Expectation: lower means more likely to get wrong (want to review)
+        expectation = alpha / total
+        
+        # Uncertainty: higher when fewer observations (want to review)
+        uncertainty = 1 / total
+        
+        # Combined score: minimize this
+        # Subtract uncertainty so that higher uncertainty leads to lower scores (more likely to be selected)
+        return (1 - config.UNCERTAINTY_FACTOR) * expectation - config.UNCERTAINTY_FACTOR * uncertainty
+    
+    return min(all_cards.keys(), key=score)
 
 # this is the exponential decay function that we use to update the alpha and beta parameters
+# probably the most important line of code in this project!
 def compute_update(similarity_score):
     return  math.exp(-config.M_decay * (1 - similarity_score))
 

@@ -1,0 +1,19 @@
+# pyproject.toml - Python Project Configuration for Vercel Deployment
+#
+# This file tells Vercel how to find and run the Flask application.
+# The [project.scripts] section defines the entry point for the Flask app.
+#
+# Dependencies are still managed by backend/requirements.txt
+
+[project]
+name = "bayesian-spaced-repetition"
+version = "1.0.0"
+description = "A Bayesian spaced repetition flashcard system with semantic similarity"
+requires-python = ">=3.11"
+
+[project.scripts]
+app = "api.index:app"
+
+[tool.vercel.scripts]
+# No build command needed - dependencies installed from requirements.txt
+

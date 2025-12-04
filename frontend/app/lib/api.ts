@@ -2,12 +2,18 @@
  * api.ts - API Configuration
  *
  * Centralized configuration for backend API communication.
- * Change API_BASE_URL here to update all API calls across the app.
+ * 
+ * In development: Uses localhost:5001 where the Flask backend runs
+ * In production (Vercel): Uses relative URLs since frontend and backend
+ *                         are served from the same domain
  *
- * Used by: AddCards.tsx, and any future components making API calls
+ * Used by: AddCards.tsx, ViewCard.tsx, MasteryGrid.tsx, and any future components
  */
 
-export const API_BASE_URL = "http://localhost:5001";
+// Use relative URLs in production (Vercel), absolute URLs in development
+export const API_BASE_URL = process.env.NODE_ENV === "production" 
+  ? "" 
+  : "http://localhost:5001";
 
 /**
  * Constructs a full API endpoint URL

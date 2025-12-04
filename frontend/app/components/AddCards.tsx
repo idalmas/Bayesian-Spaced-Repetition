@@ -13,8 +13,8 @@
  *
  * Props: None
  *
- * CSS: Uses Tailwind utility classes. Container is a white card with shadow,
- *      max-width of lg (32rem), with padding and rounded corners.
+ * CSS: Uses Tailwind utility classes. Container is a white card,
+ *      max-width of lg (32rem), with padding. Sharp edges, no shadows.
  *      Tabs use border-bottom highlight for active state.
  */
 
@@ -217,7 +217,7 @@ export default function AddCards() {
   }
 
   return (
-    <div className="w-full max-w-lg bg-white dark:bg-zinc-800 rounded-lg shadow-md p-6">
+    <div className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-6">
       <h1 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-4">
         Add Flashcards
       </h1>
@@ -264,7 +264,7 @@ export default function AddCards() {
               onChange={(e) => setFront(e.target.value)}
               placeholder="Enter the question..."
               rows={3}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -281,14 +281,14 @@ export default function AddCards() {
               onChange={(e) => setBack(e.target.value)}
               placeholder="Enter the answer..."
               rows={3}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={status.type === "loading"}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             {status.type === "loading" ? "Adding..." : "Add Card"}
           </button>
@@ -299,7 +299,7 @@ export default function AddCards() {
       {mode === "bulk" && (
         <form onSubmit={handleBulkSubmit} className="flex flex-col gap-4">
           {/* JSON Format Instructions */}
-          <div className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-md text-xs text-zinc-600 dark:text-zinc-400 font-mono">
+          <div className="p-3 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-600 dark:text-zinc-400 font-mono">
             <p className="mb-2 font-sans font-medium text-zinc-700 dark:text-zinc-300">
               Accepted JSON formats:
             </p>
@@ -350,7 +350,7 @@ export default function AddCards() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="px-3 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded-md text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+              className="px-3 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
               Upload .json file
             </button>
@@ -359,7 +359,7 @@ export default function AddCards() {
           <button
             type="submit"
             disabled={status.type === "loading"}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             {status.type === "loading" ? "Importing..." : "Import Cards"}
           </button>
@@ -369,7 +369,7 @@ export default function AddCards() {
       {/* Status message */}
       {status.type !== "idle" && status.type !== "loading" && (
         <div
-          className={`mt-4 p-3 rounded-md text-sm ${
+          className={`mt-4 p-3 text-sm ${
             status.type === "success"
               ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
               : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"

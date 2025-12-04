@@ -10,7 +10,7 @@
  * Parent: layout.tsx (root layout)
  * Children: AddCards, ViewCard, MasteryGrid
  *
- * CSS: Flexbox centering with zinc background, vertical stack of components
+ * CSS: Flexbox centering with zinc background, vertical stack of components (max-w-2xl)
  */
 
 import AddCards from "./components/AddCards";
@@ -20,7 +20,7 @@ import MasteryGrid from "./components/MasteryGrid";
 export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-100 dark:bg-zinc-900 p-4">
-      <div className="flex flex-col gap-6 w-full max-w-lg">
+      <div className="flex flex-col gap-6 w-full max-w-2xl">
         <AddCards />
         <ViewCard />
         <MasteryGrid />

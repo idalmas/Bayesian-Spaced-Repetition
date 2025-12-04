@@ -17,8 +17,11 @@
  * API Endpoints Used:
  *   - GET /api/all_cards: Fetches all cards with their mastery values
  *
+ * Events Listened:
+ *   - "cardAnswered" (CustomEvent): Auto-refreshes when ViewCard submits an answer
+ *
  * CSS: Uses Tailwind with inline HSL color interpolation for smooth gradients.
- *      Grid is responsive: 4 columns on desktop, fewer on mobile.
+ *      Sharp edges, no shadows. Grid is responsive: 2-3 columns.
  */
 
 "use client";
@@ -63,9 +66,20 @@ export default function MasteryGrid() {
     }
   }, []);
 
-  // Fetch on mount
+  // Fetch on mount and listen for cardAnswered events from ViewCard
   useEffect(() => {
     fetchCards();
+
+    // Listen for card answered events to auto-refresh
+    const handleCardAnswered = () => {
+      fetchCards();
+    };
+
+    window.addEventListener("cardAnswered", handleCardAnswered);
+
+    return () => {
+      window.removeEventListener("cardAnswered", handleCardAnswered);
+    };
   }, [fetchCards]);
 
   /**
@@ -109,7 +123,7 @@ export default function MasteryGrid() {
   }
 
   return (
-    <div className="w-full max-w-lg bg-white dark:bg-zinc-800 rounded-lg shadow-md p-6">
+    <div className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
           Mastery Grid
@@ -117,7 +131,7 @@ export default function MasteryGrid() {
         <button
           onClick={fetchCards}
           disabled={isLoading}
-          className="px-3 py-1.5 text-sm bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 disabled:opacity-50 text-zinc-700 dark:text-zinc-300 rounded-md transition-colors"
+          className="px-3 py-1.5 text-sm bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 disabled:opacity-50 text-zinc-700 dark:text-zinc-300 transition-colors"
         >
           {isLoading ? "Loading..." : "Refresh"}
         </button>
@@ -127,7 +141,7 @@ export default function MasteryGrid() {
       <div className="flex items-center gap-2 mb-4 text-xs text-zinc-600 dark:text-zinc-400">
         <span>Low</span>
         <div
-          className="flex-1 h-3 rounded-full"
+          className="flex-1 h-3"
           style={{
             background: "linear-gradient(to right, hsl(0, 75%, 45%), hsl(60, 75%, 45%), hsl(120, 75%, 45%))",
           }}
@@ -137,7 +151,7 @@ export default function MasteryGrid() {
 
       {/* Error State */}
       {error && (
-        <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-md text-red-700 dark:text-red-400 text-sm mb-4">
+        <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm mb-4">
           {error}
         </div>
       )}
@@ -154,33 +168,33 @@ export default function MasteryGrid() {
 
       {/* Card Grid */}
       {cards.length > 0 && (
-        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {cards.map((card) => (
             <div
               key={card.id}
-              className="relative aspect-square rounded-lg flex flex-col items-center justify-center p-2 cursor-default transition-transform hover:scale-105 group"
+              className="relative p-3 cursor-default transition-transform hover:scale-[1.02] group min-h-[80px] flex flex-col justify-between"
               style={{
                 backgroundColor: getMasteryBackgroundColor(card.mastery),
                 border: `2px solid ${getMasteryColor(card.mastery)}`,
               }}
               title={`${card.question}\nMastery: ${(card.mastery * 100).toFixed(0)}%`}
             >
-              {/* Mastery percentage */}
+              {/* Question text */}
+              <p className="text-xs font-medium leading-tight line-clamp-3 text-zinc-800 dark:text-zinc-100">
+                {card.question}
+              </p>
+              
+              {/* Mastery percentage - small, bottom right */}
               <span
-                className="text-lg font-bold"
+                className="text-[10px] font-medium self-end mt-1 opacity-70"
                 style={{ color: getMasteryColor(card.mastery) }}
               >
                 {(card.mastery * 100).toFixed(0)}%
               </span>
-              
-              {/* Card ID */}
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                #{card.id}
-              </span>
 
-              {/* Tooltip on hover */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-zinc-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                {truncateText(card.question, 30)}
+              {/* Tooltip on hover - shows full question */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-zinc-900 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity max-w-[200px] whitespace-normal pointer-events-none z-10">
+                {card.question}
               </div>
             </div>
           ))}
