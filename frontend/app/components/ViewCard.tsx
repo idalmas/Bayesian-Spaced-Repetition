@@ -141,7 +141,7 @@ export default function ViewCard() {
   }
 
   return (
-    <div className="w-full max-w-lg bg-white dark:bg-zinc-800 rounded-lg shadow-md p-6">
+    <div className="w-full max-w-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-6">
       <h1 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 mb-6">
         Study Cards
       </h1>

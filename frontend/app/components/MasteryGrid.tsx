@@ -112,7 +112,7 @@ export default function MasteryGrid() {
   }
 
   return (
-    <div className="w-full max-w-lg bg-white dark:bg-zinc-800 rounded-lg shadow-md p-6">
+    <div className="w-full max-w-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
           Mastery Grid
