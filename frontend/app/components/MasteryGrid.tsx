@@ -12,7 +12,8 @@
  * Parent: /progress/page.tsx
  * Children: None
  *
- * Props: None
+ * Props:
+ *   - ref: Optional ref to expose refresh() method for external triggering
  *
  * UI Components: Uses shadcn Button for refresh button
  *
@@ -20,12 +21,13 @@
  *   - GET /api/all_cards: Fetches all cards with their mastery values
  *
  * CSS: Uses Tailwind with inline HSL color interpolation for smooth gradients.
- *      Grid is responsive: 4 columns on desktop, fewer on mobile.
+ *      Grid is responsive: 2→3→4 columns scaling with screen width.
+ *      Each card shows question text in black with mastery percentage.
  */
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import { apiUrl } from "../lib/api";
 import { Button } from "@/components/ui/button";
 
@@ -35,7 +37,11 @@ interface CardMastery {
   mastery: number;
 }
 
-export default function MasteryGrid() {
+export interface MasteryGridRef {
+  refresh: () => void;
+}
+
+const MasteryGrid = forwardRef<MasteryGridRef>(function MasteryGrid(_, ref) {
   const [cards, setCards] = useState<CardMastery[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +76,11 @@ export default function MasteryGrid() {
   useEffect(() => {
     fetchCards();
   }, [fetchCards]);
+
+  // Expose refresh method via ref
+  useImperativeHandle(ref, () => ({
+    refresh: fetchCards,
+  }));
 
   /**
    * getMasteryColor - Converts mastery (0-1) to HSL color
@@ -112,7 +123,7 @@ export default function MasteryGrid() {
   }
 
   return (
-    <div className="w-full max-w-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-6">
+    <div className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100">
           Mastery Grid
@@ -131,7 +142,7 @@ export default function MasteryGrid() {
       <div className="flex items-center gap-2 mb-4 text-xs text-zinc-600 dark:text-zinc-400">
         <span>Low</span>
         <div
-          className="flex-1 h-3 rounded-full"
+          className="flex-1 h-3"
           style={{
             background: "linear-gradient(to right, hsl(0, 75%, 45%), hsl(60, 75%, 45%), hsl(120, 75%, 45%))",
           }}
@@ -158,33 +169,33 @@ export default function MasteryGrid() {
 
       {/* Card Grid */}
       {cards.length > 0 && (
-        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {cards.map((card) => (
             <div
               key={card.id}
-              className="relative aspect-square rounded-lg flex flex-col items-center justify-center p-2 cursor-default transition-transform hover:scale-105 group"
+              className="relative flex flex-col p-3 cursor-default transition-transform hover:scale-[1.02]"
               style={{
                 backgroundColor: getMasteryBackgroundColor(card.mastery),
                 border: `2px solid ${getMasteryColor(card.mastery)}`,
               }}
               title={`${card.question}\nMastery: ${(card.mastery * 100).toFixed(0)}%`}
             >
-              {/* Mastery percentage */}
-              <span
-                className="text-lg font-bold"
-                style={{ color: getMasteryColor(card.mastery) }}
-              >
-                {(card.mastery * 100).toFixed(0)}%
+              {/* Question text */}
+              <span className="text-sm font-medium text-zinc-900 dark:text-zinc-900 line-clamp-2 mb-2">
+                {card.question}
               </span>
               
-              {/* Card ID */}
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                #{card.id}
-              </span>
-
-              {/* Tooltip on hover */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-zinc-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                {truncateText(card.question, 30)}
+              {/* Bottom row: ID and mastery */}
+              <div className="flex items-center justify-between mt-auto">
+                <span className="text-xs text-zinc-500">
+                  #{card.id}
+                </span>
+                <span
+                  className="text-sm font-bold"
+                  style={{ color: getMasteryColor(card.mastery) }}
+                >
+                  {(card.mastery * 100).toFixed(0)}%
+                </span>
               </div>
             </div>
           ))}
@@ -209,5 +220,7 @@ export default function MasteryGrid() {
       )}
     </div>
   );
-}
+});
+
+export default MasteryGrid;
 

@@ -12,10 +12,11 @@
  *   4. Click "Got it" (correct) or "Missed it" (incorrect)
  *   5. Automatically fetches next card
  *
- * Parent: page.tsx (home page)
+ * Parent: page.tsx (home page), /progress/page.tsx
  * Children: None
  *
- * Props: None
+ * Props:
+ *   - onAnswerSubmit?: () => void - Optional callback fired after submitting an answer
  *
  * UI Components: Uses shadcn Button for all interactive buttons
  *
@@ -46,7 +47,11 @@ interface Status {
   message?: string;
 }
 
-export default function ViewCard() {
+interface ViewCardProps {
+  onAnswerSubmit?: () => void;
+}
+
+export default function ViewCard({ onAnswerSubmit }: ViewCardProps = {}) {
   const [card, setCard] = useState<Card | null>(null);
   const [status, setStatus] = useState<Status>({ state: "idle" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -127,6 +132,9 @@ export default function ViewCard() {
       if (!response.ok) {
         throw new Error(`HTTP error: ${response.status}`);
       }
+
+      // Notify parent that answer was submitted (for live updates)
+      onAnswerSubmit?.();
 
       // Fetch the next card
       await fetchNextCard();

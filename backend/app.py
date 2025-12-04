@@ -120,7 +120,34 @@ def answer():
 # to do this, we use the pdf of the beta distribution for each card
 # this gets the card id of the card that we think are most likely to get wrong 
 def get_next_card_id():
-      return min(all_cards.keys(), key=lambda cid: all_cards[cid]["alpha"] / (all_cards[cid]["alpha"] + all_cards[cid]["beta"]))
+    """
+    Select the next card to review based on a combined score of:
+    - Low expected mastery (more likely to get wrong)
+    - High uncertainty (haven't reviewed much)
+    
+    Returns:
+        int: The card_id of the card with the lowest combined score,
+             or None if there are no cards.
+    """
+    if not all_cards:
+        return None
+
+    def score(cid):
+        alpha = all_cards[cid]["alpha"]
+        beta = all_cards[cid]["beta"]
+
+        # Expectation: lower means more likely to get wrong (want to review)
+        expectation = alpha / (alpha + beta)
+
+        # Uncertainty: variance of Beta distribution
+        uncertainty = (alpha * beta) / ((alpha + beta) ** 2 * (alpha + beta + 1))
+        
+        # Combined score: minimize this
+        # Subtract uncertainty so that higher uncertainty leads to lower scores (more likely to be selected)
+        return (1 - config.UNCERTAINTY_FACTOR) * expectation - config.UNCERTAINTY_FACTOR * uncertainty
+
+    # Return the card_id with the minimum score (most in need of review)
+    return min(all_cards.keys(), key=score)
 
 # this is the exponential decay function that we use to update the alpha and beta parameters
 def compute_update(similarity_score):

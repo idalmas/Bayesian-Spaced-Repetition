@@ -9,4 +9,7 @@ PRIOR_ALPHA = 1.0  # Prior successes
 PRIOR_BETA = 1.0   # Prior failures
 
 # for now, we can update 
-M_decay = 1 
+M_decay = 2.501
+
+# Uncertainty factor for selecting next card
+UNCERTAINTY_FACTOR = 0.5
